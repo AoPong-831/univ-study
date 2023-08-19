@@ -17,10 +17,10 @@ def index():
     if request.method == "POST":
         name = request.form["entry"]#名前を受け取る
 
-        print(Geocoding(name))
-        return redirect("/")
+        data = Geocoding(name)
+        return render_template("index.html",name=data[0],lat=data[1],lng=data[2])
     else:
-        return render_template("index.html")
+        return render_template("index.html",name="none",lat=34,lng=135)#とりあえずエラー時の初期値
 
 if __name__ == "__main__":
     app.run(debug=True)

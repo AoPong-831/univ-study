@@ -7,6 +7,12 @@
     <input type="submit" value="送信">
 </form>
 
+<script type="text/javascript">/*Geocoding()で計測した 名前、緯度、経度を渡してる*/
+    var name = {{name|tojson}};
+    var lat = {{lat|tojson}};
+    var lng = {{lng|tojson}};
+</script>
+
 <div id="sample"></div>
 <script src="../static/js/sample.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"></script>
