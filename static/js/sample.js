@@ -14,4 +14,5 @@ function initMap() {
         position: center, // マーカーを立てる位置を指定
         map: map // マーカーを立てる地図を指定
     });
+    document.write(name + ":" + lat + ":" + lng);//一応結果表示(デバック用)
 }
