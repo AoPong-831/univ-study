@@ -17,7 +17,7 @@ def Geocoding(name):
 
 @app.route('/',methods=["GET","POST"])
 def index():
-    img_dir = "static/imgs/"
+    img_dir = "static/imgs/"#画像が入ってるファイルのpath(後で使う)
 
     #便宜上
     data = ["none",34,135]
@@ -25,13 +25,15 @@ def index():
     if request.method == "GET": img_path = None
     elif request.method == "POST":
         #POSTにより受け取った画像を読み込む
+        #---よくわからないc&p zone(htmlから画像を読み込み、pathを返す)
         stream = request.files["img"].stream
         img_array = np.asarray(bytearray(stream.read()),dtype=np.uint8)
         img = cv2.imdecode(img_array,1)
+        #---よくわからないc&p zone 終わり
         #現在時刻を名前として「imgs/」に保存する
         dt_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
         img_path = img_dir + dt_now + ".jpg"
-        cv2.imwrite(img_path, img)
+        cv2.imwrite(img_path, img)#画像保存を行う関数(ファイル名,多次元配列(numpy,ndarray))
 
         data = Geocoding("清水寺")#data = Geocoding(name)
     return render_template("index.html", img_path = img_path,name=data[0],lat=data[1],lng=data[2])
