@@ -30,6 +30,11 @@ def index():
         img_array = np.asarray(bytearray(stream.read()),dtype=np.uint8)
         img = cv2.imdecode(img_array,1)
         #---よくわからないc&p zone 終わり
+
+        #画像処理(番外編:お遊び)
+        img = (img * -1) + 255
+        img = np.clip(img, 0, 255).astype(np.uint8)
+
         #現在時刻を名前として「imgs/」に保存する
         dt_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
         img_path = img_dir + dt_now + ".jpg"
