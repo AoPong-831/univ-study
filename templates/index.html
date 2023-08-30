@@ -16,7 +16,7 @@
 <script type="text/javascript">/*Geocoding()で計測した 名前、緯度、経度を渡してる*/
     var name = {{name|tojson}};
     var lat = {{lat|tojson}};
-    var lng = {{lng|tojson}};
+    var lng = {{lng|tojson}};/*<warning> 最後の script src="" の callback=initMap をどうにかしてAPI渡さないと、ずっとマップが黒いままだよ*/
 </script>
 
 <div id="sample"></div>

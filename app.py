@@ -7,7 +7,7 @@ import easyocr
 
 app = Flask(__name__)
 
-GoogleApiKey = 'AIzaSyANuDUtyjaATaB2wXaJzo4MQI7XXu9Rbxg'
+GoogleApiKey = 'AIzaSyAhw39tHBs0l5t2gro0I8tmMI93JZk5OfU'
 gmaps = googlemaps.Client(key=GoogleApiKey)
 
 def Geocoding(name):
@@ -46,7 +46,7 @@ def index():
 
         #geocoding
         data = Geocoding(result[0])#data = Geocoding(name)
-    return render_template("index.html", img_path = img_path,name=data[0],lat=data[1],lng=data[2])
+    return render_template("index.html", img_path = img_path,name=data[0],lat=data[1],lng=data[2],API=GoogleApiKey)
 
 if __name__ == "__main__":
     app.run(debug=True)
