@@ -2,7 +2,7 @@
 {% block title %}TOPページ{% endblock %}
 
 {% block content %}
-<form enctype="multipart/form-data">
+<form action="/" enctype="multipart/form-data">
     <input type="file" name="img">
     <button type="submit" formmethod="post">検索</button>
     {% if img_path %}
@@ -11,6 +11,10 @@
     </div>
     <p>{{img_path}}</p>
     {% endif %}
+</form>
+
+<form method="GET" action="/yolov5">
+    <button type="submit">yolov5</button>
 </form>
 
 <script type="text/javascript">/*Geocoding()で計測した 名前、緯度、経度を渡してる*/
