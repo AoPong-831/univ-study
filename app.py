@@ -73,7 +73,7 @@ def yolov5():
 
     #yolov5
     files = os.listdir("static/imgs")#指定pathの中身をlistで取得。(該当画像)
-    cmd = "python yolov5/detect.py --source static/imgs/"+files[0]#cmdを書く(detect.pyを動かすため)
+    cmd = "python yolov5/detect.py --source static/imgs/"+files[0]+" --weights yolov5/best.pt"#cmdを書く(detect.pyを動かすため)
     subprocess.call(cmd.split())#cmd実行
 
     return index()
