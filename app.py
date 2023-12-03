@@ -12,10 +12,18 @@ import time
 import torch
 import csv
 
-app = Flask(__name__)
 
-GoogleApiKey = 'AIzaSyANuDUtyjaATaB2wXaJzo4MQI7XXu9Rbxg'
-gmaps = googlemaps.Client(key=GoogleApiKey)
+def EasyOcr(img_path):
+    reader = easyocr.Reader(["ja","en"])#認識言語設定
+    result = reader.readtext(img_path,detail=0)#文字読み込み
+    
+    #画像処理結果を表示
+    print("-"*30)
+    for i in result:
+        print("["+ i +"]")
+    print("-"*30)
+
+    return result
 
 def Geocoding(name):
     try:
@@ -27,6 +35,15 @@ def Geocoding(name):
         data = ["error",34,135]
     return data
 
+
+
+
+
+app = Flask(__name__)
+
+GoogleApiKey = 'AIzaSyANuDUtyjaATaB2wXaJzo4MQI7XXu9Rbxg'
+gmaps = googlemaps.Client(key=GoogleApiKey)
+
 @app.route('/',methods=["GET","POST"])
 def index():
     img_dir = "static/imgs/"#画像が入ってるファイルのpath(後で使う)
@@ -36,9 +53,9 @@ def index():
 
     if request.method == "GET": img_path = None
     elif request.method == "POST":
-        #imgsの中身を一旦空にする(imgsを消して、再度作成)
-        shutil.rmtree('static/imgs')
-        os.mkdir('static/imgs')
+        #imgsの中身を一旦空にする(1.imgsを消して、2.再度作成)
+        shutil.rmtree('static/imgs')#1
+        os.mkdir('static/imgs')#2
 
         #POSTにより受け取った画像を読み込む
         #---よくわからないc&p zone(htmlから画像を読み込み、pathを返す)
@@ -47,35 +64,20 @@ def index():
         img = cv2.imdecode(img_array,1)#画像データ(配列)
         #---よくわからないc&p zone 終わり
 
-        #***現在時刻を名前として「imgs/」に保存する
-        dt_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
-        img_path = img_dir + dt_now + ".jpg"
+        img_path = img_dir + "pic.jpg"#画像の名前設定(原則 pic.jpg)
         cv2.imwrite(img_path, img)#画像保存を行う関数(ファイル名,多次元配列(numpy,ndarray))
         #***
 
-        #画像処理(easyocr)
-        reader = easyocr.Reader(["ja","en"])
-        result = reader.readtext(img_path,detail=0)#文字に直す？
-        #画像処理結果を表示
-        print("-"*30)
-        for i in result:
-            print("["+ i +"]")
-        print("-"*30)
-            
+    #保存した画像ファイルのpathをHTMLに渡す
+    return render_template("index.html", img_path = img_path,name=None,lat=None,lng=None,API=GoogleApiKey)
 
-        #geocoding
-        try:
-            data = Geocoding(result[0])#data = Geocoding(name)
-        except:#Geocording で何かしらのエラーが起こった時。
-            data = ['none', 0, 0]
 
-    #保存した画像ファイルのpath, geocordingデータをHTMLに渡す
-    return render_template("index.html", img_path = img_path,name=data[0],lat=data[1],lng=data[2],API=GoogleApiKey)
+
 
 
 @app.route('/yolov5', methods=['GET'])
 def yolov5():
-    #detectの中身を一旦空にする(1.detectを消して、再度作成)(2.imgsと同様の動作)
+    #detectの中身を一旦空にする(1.detectを消して、2.再度作成)(indexの最初、static/imgsと同様の動作)
     try:#2を実行後、yoloがエラーを吐いて止まった時用。
         shutil.rmtree('runs/detect')#1
     except:
@@ -87,8 +89,7 @@ def yolov5():
     # 検出できる物体を表示する(80種類)
     print(model.names)#いつか使う?ために残してる。
  
-    files = os.listdir("static/imgs")#指定pathの中身をlistで取得。(該当画像)
-    results = model("static/imgs/"+files[0])  # 画像パスを設定し、物体検出を行う
+    results = model("static/imgs/pic.jpg")  # 画像パスを設定し、物体検出を行う
     objects = results.pandas().xyxy[0]  # 検出結果を取得してobjectに格納
     # objectに格納したデータ
     # => バウンディングBOX左上のx座標とy座標、信頼度、クラスラベル、物体名
@@ -110,8 +111,24 @@ def yolov5():
     results.show()  # 検出した物体の表示
     results.crop()  # 検出した物体の切り取り
     #==========画像切り取り終わり
+
+
+    img_path = "runs/detect/exp/crops/license/pic.jpg"#ここいずれ複数検索に対応させる。(以下)
+    #files = os.listdir(img_path)#file内のファイル名をlistで列挙
+
+    #画像処理(easyocr)
+    result = EasyOcr(img_path)
+
+    #geocoding
+    try:
+        data = Geocoding(result[0])#data = Geocoding(name)
+    except:#Geocording で何かしらのエラーが起こった時。
+        data = ['none', 0, 0]
+
+    #保存した画像ファイルのpath, geocordingデータをHTMLに渡す
+    return render_template("index.html", img_path = img_path,name=data[0],lat=data[1],lng=data[2],API=GoogleApiKey)    
     
-    return index()
+    #return index()
 
 
 if __name__ == "__main__":
