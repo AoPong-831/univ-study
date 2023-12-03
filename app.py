@@ -108,7 +108,6 @@ def yolov5():
             # csvファイルにバウンディングBOX情報を出力
             print(f"{i},{name},{xmin},{ymin},{width},{height}", file=f)
 
-    results.show()  # 検出した物体の表示
     results.crop()  # 検出した物体の切り取り
     #==========画像切り取り終わり
 
