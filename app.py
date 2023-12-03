@@ -9,10 +9,12 @@ import subprocess
 import os
 import shutil
 import time
+import torch
+import csv
 
 app = Flask(__name__)
 
-GoogleApiKey = 'AIzaSyAhw39tHBs0l5t2gro0I8tmMI93JZk5OfU'
+GoogleApiKey = 'AIzaSyANuDUtyjaATaB2wXaJzo4MQI7XXu9Rbxg'
 gmaps = googlemaps.Client(key=GoogleApiKey)
 
 def Geocoding(name):
@@ -54,6 +56,12 @@ def index():
         #画像処理(easyocr)
         reader = easyocr.Reader(["ja","en"])
         result = reader.readtext(img_path,detail=0)#文字に直す？
+        #画像処理結果を表示
+        print("-"*30)
+        for i in result:
+            print("["+ i +"]")
+        print("-"*30)
+            
 
         #geocoding
         try:
@@ -67,9 +75,9 @@ def index():
 
 @app.route('/yolov5', methods=['GET'])
 def yolov5():
-    #detectの中身を一旦空にする(detectを消して、再度作成)(imgsと同様の動作)
-    shutil.rmtree('yolov5/runs/detect')
-    os.mkdir('yolov5/runs/detect')
+    #detectの中身を一旦空にする(1.detectを消して、再度作成)(2.imgsと同様の動作)
+    shutil.rmtree('yolov5/runs/detect')#1
+    os.mkdir('yolov5/runs/detect')#2
 
     #yolov5
     files = os.listdir("static/imgs")#指定pathの中身をlistで取得。(該当画像)
