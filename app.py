@@ -76,14 +76,41 @@ def index():
 @app.route('/yolov5', methods=['GET'])
 def yolov5():
     #detectの中身を一旦空にする(1.detectを消して、再度作成)(2.imgsと同様の動作)
-    shutil.rmtree('yolov5/runs/detect')#1
-    os.mkdir('yolov5/runs/detect')#2
+    try:#2を実行後、yoloがエラーを吐いて止まった時用。
+        shutil.rmtree('runs/detect')#1
+    except:
+        pass
+    os.mkdir('runs/detect')#2
 
-    #yolov5
+    #画像切り取り==========
+    model = torch.hub.load("yolov5", "best", source='local')#(実行ファイル, 重み付け, ...)の順に書く。
+    # 検出できる物体を表示する(80種類)
+    print(model.names)#いつか使う?ために残してる。
+ 
     files = os.listdir("static/imgs")#指定pathの中身をlistで取得。(該当画像)
-    cmd = "python yolov5/detect.py --source static/imgs/"+files[0]+" --weights yolov5/best.pt"#cmdを書く(detect.pyを動かすため)
-    subprocess.call(cmd.split())#cmd実行
+    results = model("static/imgs/"+files[0])  # 画像パスを設定し、物体検出を行う
+    objects = results.pandas().xyxy[0]  # 検出結果を取得してobjectに格納
+    # objectに格納したデータ
+    # => バウンディングBOX左上のx座標とy座標、信頼度、クラスラベル、物体名
 
+    # 物体検出結果を出力するためのcsvファイルを作成
+    with open('detection_Result.csv', 'w') as f:
+        print("ID,種類,x座標,y座標,幅,高さ", file=f) # print()の第2引数で出力先を指定可能
+ 
+        for i in range(len(objects)):
+            name = objects.name[i]
+            xmin = objects.xmin[i]
+            ymin = objects.ymin[i]
+            width = objects.xmax[i] - objects.xmin[i]
+            height = objects.ymax[i] - objects.ymin[i]
+            # print(f"{i}, 種類:{name}, 座標x:{xmin}, 座標y:{ymin}, 幅:{width}, 高さ:{height}")
+            # csvファイルにバウンディングBOX情報を出力
+            print(f"{i},{name},{xmin},{ymin},{width},{height}", file=f)
+
+    results.show()  # 検出した物体の表示
+    results.crop()  # 検出した物体の切り取り
+    #==========画像切り取り終わり
+    
     return index()
 
 
