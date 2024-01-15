@@ -23,7 +23,8 @@
     var lng = {{lng|tojson}};/*<warning> 最後の script src="" の callback=initMap をどうにかしてAPI渡さないと、ずっとマップが黒いままだよ*/
 </script>
 
-<div id="sample"></div>
-<script src="../static/js/sample.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?callback=initMap"></script>
+<div id="sample">
+    <script src="../static/js/sample.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyANuDUtyjaATaB2wXaJzo4MQI7XXu9Rbxg&callback=initMap"></script>
+</div>
 {% endblock %}
