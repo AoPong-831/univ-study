@@ -18,10 +18,12 @@
 </form>
 
 <script type="text/javascript">/*Geocoding()で計測した 名前、緯度、経度を渡してる*/
-    var name = {{name|tojson}};
+    var placeName = {{placeName|tojson}};
     var lat = {{lat|tojson}};
-    var lng = {{lng|tojson}};/*<warning> 最後の script src="" の callback=initMap をどうにかしてAPI渡さないと、ずっとマップが黒いままだよ*/
+    var lng = {{lng|tojson}};
 </script>
+
+<div id="resultText">[デバッグ用]検索結果表示(地名:緯度:軽度)</div>
 
 <div id="sample">
     <script src="../static/js/sample.js"></script>

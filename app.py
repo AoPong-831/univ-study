@@ -11,19 +11,29 @@ import shutil
 import time
 import torch
 import csv
+import re
 
 
 def EasyOcr(img_path):
     reader = easyocr.Reader(["ja","en"])#認識言語設定
     result = reader.readtext(img_path,detail=0)#文字読み込み
     
-    #画像処理結果を表示
+    #画像処理結果を表示、綺麗にして出荷
     print("-"*30)
+    #resultから、いらない文字を消すためのリスト
+    DELETE_CHARACTER = ["\\d","[.|\[|\]]"]#[\d]数字消す,". [ ]"消す,
+    newResult = []
     for i in result:
+        #resultから、いらない文字消す
+        for j in DELETE_CHARACTER:
+            i = re.sub(j,"", i)
         print("["+ i +"]")
+        if i:#適切な文字があればリストに保管
+            newResult.append(i)
     print("-"*30)
 
-    return result
+    print(newResult)
+    return newResult
 
 def Geocoding(name):
     try:
@@ -69,7 +79,7 @@ def index():
         #***
 
     #保存した画像ファイルのpathをHTMLに渡す
-    return render_template("index.html", img_path = img_path,name=None,lat=None,lng=None,API=GoogleApiKey)
+    return render_template("index.html", img_path = img_path,placeName=None,lat=None,lng=None,API=GoogleApiKey)
 
 
 
@@ -125,9 +135,8 @@ def yolov5():
         data = ['none', 0, 0]
 
     #保存した画像ファイルのpath, geocordingデータをHTMLに渡す
-    return render_template("index.html", img_path = img_path,name=data[0],lat=data[1],lng=data[2],API=GoogleApiKey)    
+    return render_template("index.html", img_path = img_path,placeName=data[0],lat=data[1],lng=data[2],API=GoogleApiKey)    
     
-    #return index()
 
 
 if __name__ == "__main__":
